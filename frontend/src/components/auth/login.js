@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../navbar";
 import checkGuest from "./checkGuest";
 
@@ -9,9 +10,10 @@ function Login() {
     var [email, setEmail] = useState('');
     var [password, setPassword] = useState('');
     var [errorMessage, setErrorMessage] = useState('');
+    var navigate = useNavigate();
     const dispatch = useDispatch();
     function attemptLogin() {
-        axios.post('http://localhost:8080/login',{
+        axios.post('http://localhost:8080/auth/login',{
             email:email,
             password:password
         }).then(response=>{
@@ -21,7 +23,9 @@ function Login() {
                 token:response.data.token
             }
             dispatch(setUser(user));  
+            navigate('/');
         }).catch(error=>{
+            console.log(error.response.data.errors);
             // if(error.response.data.errors){
             //     setErrorMessage(Object.values(error.response.data.errors).join(' '))
             // }else if(error.response.data.message){
@@ -29,11 +33,22 @@ function Login() {
             // }else{
             //     setErrorMessage('Failed to login user. Please contact admin')
             // }
-            console.log(error)
+            if (error.response && error.response.data) {
+                if (error.response.data) {
+                setErrorMessage(Object.values(error.response.data).map((message, index)=> {
+                   return <div key={index}>{message}</div>
+                }))
+                } else {
+                  setErrorMessage('An error occurred during registration.');
+                }
+              } else {
+                setErrorMessage('Failed to connect to the API');
+              }
+            // console.log(error)
         })
     }
     return (<div>
-        {/* <Navbar/> */}
+        <Navbar/>
         <div className="container">
             <div className="row">
                 <div className="col-8 offset-2">

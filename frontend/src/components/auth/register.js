@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import Navbar from "../navbar";
+import Navbar from "../navbar";
 
 function Register() {
     var [name, setName] = useState('');
@@ -15,21 +15,27 @@ function Register() {
             name: name,
             email: email,
             password: password,
-            password_confirmation: passwordConf
+            passwordConf: passwordConf
         }
-        axios.post('http://localhost:8080/register',user).then(response=>{
+        axios.post('http://localhost:8080/auth/register',user).then(response=>{
             setErrorMessage('');
-            navigate('/');
+            navigate('/login');
         }).catch(error=>{
-            if(error.response.data.errors){
-                setErrorMessage(Object.values(error.response.data.errors).join(' '));
-            }else{
-                setErrorMessage('Failed to connect to api');
-            }
+            if (error.response && error.response.data) {
+                if (error.response.data) {
+                setErrorMessage(Object.values(error.response.data).map((message, index)=> {
+                   return <div key={index}>{message}</div>
+                }))
+                } else {
+                  setErrorMessage('An error occurred during registration.');
+                }
+              } else {
+                setErrorMessage('Failed to connect to the API');
+              }
         })
     }
     return <div>
-        {/* <Navbar/> */}
+        <Navbar/>
         <div className="container">
             <div className="row">
                 <div className="col-8 offset-2">

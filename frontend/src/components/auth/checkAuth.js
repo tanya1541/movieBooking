@@ -8,7 +8,7 @@ export const checkAuth = (Component) =>{
         var navigate = useNavigate();
         useEffect(()=> {
             if(!user){
-                navigate('/login');
+                navigate('login');
             }
         },[user]);
         return <Component {...props}/>
